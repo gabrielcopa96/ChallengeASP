@@ -1,0 +1,91 @@
+<div class="card">
+    <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="col col-md-6">
+                <h5 class="card-title">
+                    {{ '::Pasajeros' | abpLocalization }}
+                </h5>
+            </div>
+            <div class="text-end col col-md-6">
+                <button *abpPermission="'EntrevistaABP.Pasajeros.Create'" pButton pRipple class="p-button-success"
+                    type="button" (click)="createPasajero()">
+                    <i class="fa fa-plus me-1"></i>
+                    <span>{{ "::Nuevo Pasajero" | abpLocalization }}</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <ngx-datatable [rows]="pasajero.items" [count]="pasajero.totalCount" [list]="list" default>
+            <ngx-datatable-column [name]="'::Nombre' | abpLocalization" prop="nombre"></ngx-datatable-column>
+            <ngx-datatable-column [name]="'::Apellido' | abpLocalization" prop="apellido"></ngx-datatable-column>
+            <ngx-datatable-column [name]="'::Dni' | abpLocalization" prop="dni"></ngx-datatable-column>
+            <ngx-datatable-column [name]="'::Fecha de Nacimiento' | abpLocalization" prop="fechaNacimiento">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                    {{ row.fechaNacimiento | date }}
+                </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column [name]="'::Actions' | abpLocalization" [maxWidth]="220" [sortable]="false">
+
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                    <div class="d-flex justify-content-between gap-2">
+                        <button *abpPermission="'EntrevistaABP.Pasajeros.Edit'" pButton pRipple type="button"
+                            class="p-button-sm" (click)="editPasajero(row.id)">
+                            <i class="fa fa-pencil me-1"></i>
+                            <span *ngIf="sizeDisplay">{{ "::Edit" | abpLocalization }}</span>
+                        </button>
+                        <button *abpPermission="'EntrevistaABP.Pasajeros.Delete'" pButton pRipple type="button"
+                            class="p-button-danger p-button-sm" (click)="deletePasajero(row.id)">
+                            <i class="fa fa-trash me-1"></i>
+                            <span *ngIf="sizeDisplay">{{ "::Delete" | abpLocalization }}</span>
+                        </button>
+                    </div>
+                </ng-template>
+
+            </ngx-datatable-column>
+        </ngx-datatable>
+    </div>
+</div>
+
+<p-dialog header="Header" [(visible)]="isModalOpen" [breakpoints]="{ '960px': '75vw' }" [modal]="true" appendTo="body" [style]="{ width: '38vw' }"
+    [draggable]="false" [resizable]="true" [dismissableMask]="true">
+
+    <ng-template pTemplate="header">
+        <h4 class="p-dialog-title">{{ '::Pasajeros' | abpLocalization }}</h4>
+    </ng-template>
+
+    <ng-template pTemplate="p-dialog-content">
+
+        <form [formGroup]="form" (ngSubmit)="save()">
+            <div class="mt-2">
+                <label for="Nombre">Nombre</label><span>*</span>
+                <input type="text" pInputText class="form-control" formControlName="Nombre" />
+            </div>
+
+            <div class="mt-2">
+                <label for="Apellido">Apellido</label><span>*</span>
+                <input type="text" pInputText class="form-control" formControlName="Apellido" />
+            </div>
+
+            <div class="mt-2">
+                <label for="Dni">Dni</label><span>*</span>
+                <input type="text" pInputText class="form-control" formControlName="Dni" />
+            </div>
+
+            <div class="mt-2 d-flex flex-column">
+                <label for="FechaNacimiento">Fecha de Nacimiento<span>*</span></label>
+                <p-calendar appendTo="body" id="FechaNacimiento" [showIcon]="true" formControlName="FechaNacimiento"
+                    ngDefaultControl></p-calendar>
+
+            </div>
+        </form>
+
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple class="p-button-info" type="button" (click)="save()" [disabled]="form.invalid">
+            <i class="fa fa-check me-1"></i>
+            <span>{{ "::Guardar" | abpLocalization }}</span>
+        </button>
+    </ng-template>
+</p-dialog>

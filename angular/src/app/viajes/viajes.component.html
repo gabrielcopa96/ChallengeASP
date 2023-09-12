@@ -1,0 +1,124 @@
+<div class="card">
+    <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="col col-md-6">
+                <h5 class="card-title">
+                    {{ '::Viajes' | abpLocalization }}
+                </h5>
+            </div>
+            <div class="text-end col col-md-6">
+                <button *abpPermission="'EntrevistaABP.Viajes.Create'" pButton pRipple class="p-button-success"
+                    type="button" (click)="createViaje()">
+                    <i class="fa fa-plus me-1"></i>
+                    <span>{{ "::Nuevo Viaje" | abpLocalization }}</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <ngx-datatable [rows]="viaje.items" [count]="viaje.totalCount" [list]="list" default>
+            <ngx-datatable-column [name]="'::Salida' | abpLocalization" prop="fechaSalida">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                    {{ row.fechaSalida | date }}
+                </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column [name]="'::Llegada' | abpLocalization" prop="fechaLlegada">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                    {{ row.fechaLlegada | date }}
+                </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column [name]="'::Origen' | abpLocalization" prop="origen"></ngx-datatable-column>
+            <ngx-datatable-column [name]="'::Destino' | abpLocalization" prop="destino"></ngx-datatable-column>
+            <ngx-datatable-column [name]="'::Transporte' | abpLocalization"
+                prop="medioTransporte"></ngx-datatable-column>
+
+            <ngx-datatable-column *abpPermission="'EntrevistaABP.Viajes.Edit' || 'EntrevistaABP.Viajes.Delete'"
+                [name]="'::Actions' | abpLocalization" [maxWidth]="220" [sortable]="false">
+
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                    <div class="d-flex align-items-center gap-2">
+                        <button *abpPermission="'EntrevistaABP.Viajes.Edit'" pButton pRipple type="button"
+                            class="p-button-sm" (click)="editarViaje(row.id)">
+                            <i class="fa fa-pencil me-1"></i>
+                            <span *ngIf="sizeDisplay">{{ "::Edit" | abpLocalization }}</span>
+                        </button>
+                        <button *abpPermission="'EntrevistaABP.Viajes.Delete'" pButton pRipple type="button"
+                            class="p-button-danger p-button-sm" (click)="deleteViaje(row.id)">
+                            <i class="fa fa-trash me-1"></i>
+                            <span *ngIf="sizeDisplay">{{ "::Delete" | abpLocalization }}</span>
+                        </button>
+                    </div>
+                </ng-template>
+
+            </ngx-datatable-column>
+        </ngx-datatable>
+    </div>
+</div>
+
+<p-dialog header="Header" [(visible)]="isModalOpen" [modal]="true" [breakpoints]="{ '960px': '75vw' }" appendTo="body"
+    [style]="{ width: '38vw' }" [draggable]="false" [resizable]="true" [dismissableMask]="true">
+    <ng-template pTemplate="header">
+        <h4 class="p-dialog-title">{{ '::Viajes' | abpLocalization }}</h4>
+    </ng-template>
+
+    <ng-template pTemplate="p-dialog-content">
+
+        <form [formGroup]="form" (ngSubmit)="save()">
+            <div class="mt-2">
+                <label for="Origen">Origen</label><span>*</span>
+                <input type="text" pInputText class="form-control" formControlName="Origen" />
+            </div>
+
+            <div class="mt-2">
+                <label for="Destino">Destino</label><span>*</span>
+                <input type="text" pInputText class="form-control" formControlName="Destino" />
+            </div>
+
+            <div class="mt-2">
+                <label for="MedioTransporte">Medio de Transporte</label><span>*</span>
+                <input type="text" pInputText class="form-control" formControlName="MedioTransporte" />
+            </div>
+
+            <div class="mt-2 d-flex flex-column">
+                <label for="FechaSalida">Salida<span>*</span></label>
+                <p-calendar appendTo="body" id="FechaSalida" [showIcon]="true" formControlName="FechaSalida"
+                    ngDefaultControl></p-calendar>
+
+            </div>
+
+            <div class="mt-2 d-flex flex-column">
+                <label for="FechaLlegada">Llegada<span>*</span></label>
+                <p-calendar id="FechaSalida" appendTo="body" [showIcon]="true" formControlName="FechaLlegada"
+                    ngDefaultControl></p-calendar>
+
+            </div>
+
+            <div class="mt-2">
+                <label class="p-multiselect-label" for="PasajerosNames">Pasajeros</label>
+                <p-multiSelect appendTo="body" defaultLabel="Seleccionar pasajeros" class="p-multiselect"
+                    [options]="pasajeros.items" formControlName="PasajerosNames" [optionLabel]="'nombreCompleto'"
+                    display="chip">
+                </p-multiSelect>
+            </div>
+
+            <div class="mt-2">
+                <label class="p-multiselect-label" for="Coordinador">Coordinador</label>
+                <div class="coordinador">
+                    <p-dropdown appendTo="body" [options]="pasajeros.items" placeholder="Select a coordinador"
+                        formControlName="Coordinador" [optionLabel]="'nombreCompleto'"></p-dropdown>
+                    <p-chip [label]="selectedViaje.coordinador"
+                        image="https://e7.pngegg.com/pngimages/84/165/png-clipart-united-states-avatar-organization-information-user-avatar-service-computer-wallpaper-thumbnail.png"></p-chip>
+                </div>
+            </div>
+
+        </form>
+
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple class="p-button-info" type="button" (click)="save()" [disabled]="form.invalid">
+            <i class="fa fa-check me-1"></i>
+            <span>{{ "::Guardar" | abpLocalization }}</span>
+        </button>
+    </ng-template>
+</p-dialog>
